@@ -7,6 +7,7 @@ response.raise_for_status()
 
 soup = BeautifulSoup(response.text, 'html.parser')
 
+# Get the state anchor tags
 data = soup.select('div#route-guide strong a')
 
 state_links =[]
