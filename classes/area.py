@@ -59,6 +59,11 @@ class Area:
             summary += f'\ncoords: {self.coord}'
         return summary
     
+    def get_area_short_summary(self):
+        section_sum = f' {len(self.subArea)} sections |' if len(self.subArea) > 0 else ''
+        summary = f'{self.name}:{section_sum} {self.no_of_climbs} climbs'
+        return summary
+
     def get_id_from_url(url):
         url_parts = url.split('/')
         id = None
