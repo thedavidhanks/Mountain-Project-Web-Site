@@ -46,12 +46,11 @@ for state_url in states_to_eval:
         area_links.append(link['href'])
     status += 'Found '+str(len(area_links))+' areas in '+state_name+'...\n'
     clean_term_output(status)
-climb_names = []
-grade_list = []
-gps_list = []
+
 state_areas = []
 total_climbs = 0
 total_areas = 0
+climbs_dict = {}
 for url in area_links:
     new_area = getAreaInfo(url)
     total_areas += 1
@@ -59,13 +58,18 @@ for url in area_links:
     state_areas.append(new_area)
     # Write the area to it's own json
     # Serializing json
-    json_object = json.dumps(new_area.get_climbs_dict(), indent=4)
+    climbs_dict.update(new_area.get_climbs_dict())
     
-    # Writing to sample.json
-    with open(PATH_TO_OUTPUT+new_area.name.replace('/','')+".json", "w") as outfile:
-        outfile.write(json_object)
     print(new_area.get_area_short_summary())
 
+# Write to json
+json_object = json.dumps(climbs_dict, indent=4)
+status += f"Writing climbs.json - {total_climbs} climbs"
+clean_term_output(status)
+with open(PATH_TO_OUTPUT+"climbs.json", "w") as outfile:
+    outfile.write(json_object)
+
+# Summary
 summary = f'\n\n------SUMMARY------\nFound {total_climbs} climbs\nFound {total_areas} areas\n-------------------'
 status += summary
 clean_term_output(status)
