@@ -61,7 +61,7 @@ def getAreaInfo(url):
     # Get the area name
     area_heading_tag = soup.select_one('h1')
     area_name = area_heading_tag.contents[0].replace('\n','').strip()
-    
+    if False: print(f'Getting areaInfo for {area_name} using {url}')
     gps_string = coord_str_from_soup(soup)
     area_id = Area.get_id_from_url(url)
     current_area = Area(area_id, area_name, coord=gps_from_string(gps_string),url=url)
@@ -75,8 +75,8 @@ def getAreaInfo(url):
     for link in subArea_table:
         subArea_url = link['href']
         subArea_name = link.string
-        if 'area' in subArea_url and validators.url(subArea_url):
-            if DEBUG: print(f'Adding sub-area: {subArea_name} @ {subArea_url} to {current_area.name}')                
+        if '/area/' in subArea_url and validators.url(subArea_url):
+            if False: print(f'Adding sub-area: {subArea_name} @ {subArea_url} to {current_area.name}')                
             current_area.add_subArea(getAreaInfo(subArea_url))  # Recursion 8P    
-    
+    if False: print(f'{current_area.name} has {len(current_area.subArea)} sections with {current_area.no_of_climbs} climbs')
     return current_area
