@@ -37,7 +37,6 @@ states_to_eval = state_links[:STATES_TO_TEST] if TESTING else state_links
 status += 'Indexing climbs in '+str(len(states_to_eval))+' states...\n'
 clean_term_output(status)
 for state_url in states_to_eval:
-    # TODO get the state name from state_url
     state_name = state_url.split('/')[-1]
     response = requests.get(url=state_url)
     soup = BeautifulSoup(response.text, 'html.parser')
