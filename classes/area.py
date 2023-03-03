@@ -8,6 +8,7 @@ class Area:
     # coord: object, like {lat: 30.0, long: -85.0}
     # desc: string
     # subAreas: List of Area instances
+    # climbs: List of all climbs
 
     def __init__ (self, id, name, coord=None, no_of_climbs=0, desc=None, url=None):
         self.mp_id = id
@@ -72,3 +73,17 @@ class Area:
                 id = part
                 break
         return id
+    
+    def get_climbs_dict(self, include_subAreas = True):
+        # get all the climbs in this area and all subarea
+        climbs_dict = {}
+        for climb in self.climbs:
+            # add to the climbs dict
+            climbs_dict[climb.mp_id] = climb.__dict__
+        
+        if include_subAreas and len(self.subArea) > 0:
+            if DEBUG: print(f'printing subareas for {self.name}')
+            for area in self.subArea:
+                climbs_dict.update(area.get_climbs_dict(include_subAreas=include_subAreas))
+        
+        return climbs_dict

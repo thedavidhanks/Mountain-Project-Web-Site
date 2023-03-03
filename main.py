@@ -5,11 +5,12 @@ from pprint import pprint
 from lxml import etree
 
 from terminal import clean_term_output
+from webCrawler.parseUrl import getAreaInfo
 
 TESTING = True
 STATES_TO_TEST = 1
 URL = 'https://www.mountainproject.com/'
-PATH_TO_OUTPUT = './output'
+PATH_TO_OUTPUT = './output/'
 
 response = requests.get(url=URL)
 response.raise_for_status()
@@ -48,35 +49,23 @@ for state_url in states_to_eval:
 climb_names = []
 grade_list = []
 gps_list = []
+state_areas = []
+total_climbs = 0
+total_areas = 0
+for url in area_links:
+    new_area = getAreaInfo(url)
+    total_areas += 1
+    total_climbs += new_area.no_of_climbs
+    state_areas.append(new_area)
+    # Write the area to it's own json
+    # Serializing json
+    json_object = json.dumps(new_area.get_climbs_dict(), indent=4)
+    
+    # Writing to sample.json
+    with open(PATH_TO_OUTPUT+new_area.name.replace('/','')+".json", "w") as outfile:
+        outfile.write(json_object)
+    print(new_area.get_area_short_summary())
 
-for item in area_links:
-    response = requests.get(url=item)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    names = soup.select('table.width100 tr td a')
-    grades = soup.select('span.rateYDS')
-    gps = soup.select_one('table.description-details tr td a').find_parent().find_parent().get_text(strip=True,).split("G")[0]
-
-    for grade in grades:
-        grade_real = grade.text
-        grade_list.append(grade_real)
-        gps_list.append(gps)
-    for climb in names:
-        climb_name = climb.text
-        climb_names.append(climb_name)
-
-climb_dict = {}
-n = 0
-for item in climb_names:
-    climb = item.title()
-    grade = grade_list[n]
-    climb_dict[n] = {climb: [{'grade': grade}, {'gps': gps_list[n]}]}
-    n+=1
-climb_list_json = json.dumps(climb_dict, indent=4)
-
-# Writing to sample.json
-with open(PATH_TO_OUTPUT+"/climbs.json", "w") as outfile:
-    outfile.write(climb_list_json)
-
-summary = f'\n\n------SUMMARY------\nFound {str(len(climb_dict))} climbs\nFound {str(len(grade_list))} grades\nFound {str(len(gps_list))} coords\n-------------------'
+summary = f'\n\n------SUMMARY------\nFound {total_climbs} climbs\nFound {total_areas} areas\n-------------------'
 status += summary
 clean_term_output(status)
